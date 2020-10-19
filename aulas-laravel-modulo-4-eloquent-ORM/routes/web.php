@@ -16,6 +16,7 @@ Route::get('/', function () {
 });
 
 //CRIANDO UM CRUD BÁSICO
+//MIDDLEWARE NO CONTROLLER tarefasController
 Route::prefix('/tarefas')->group(function (){
     Route::get('/', 'TarefasController@index')->name('tarefas.index'); //Listagem de tarefas
 
@@ -29,3 +30,37 @@ Route::prefix('/tarefas')->group(function (){
 
     Route::get('marcar/{id}', 'TarefasController@done')->name('tarefas.done'); //marcar tarefa como resolvida/não resolvida
 });
+
+//RESOURCE CONTROLLER
+Route::resource('todo', 'TodoController');
+
+//GET    - /todo - index - todo.index - LISTA OS ITENS
+//GET    - /todo/create - create - todo.create - FORM DE CRIAÇÃO
+//POST   - /todo - store - todo.store - RECEBER DADOS E ADD ITEM
+//GET    - /todo/{id} - show - todo.show - ITEM INDIVIDUAL
+//GET    - /todo/{id}/edit - edit - todo.edit - FORM EDIÇÃO
+//PUT    - /todo/{id} - update - todo.update - RECEBER DADOS E ATUALIZAR ITEM
+//DELETE - /todo/{id}/ - destroy - todo.destroy - DELETETAR ITEM
+
+
+//MIDDLEWARE
+
+//login
+Route::get('/login', 'Auth\LoginController@index')->name('login');
+Route::post('/login', 'Auth\LoginController@authenticate');
+
+//Registro
+Route::get('/register','Auth\RegisterController@index')->name('register');
+Route::post('/register', 'Auth\RegisterController@register');
+
+//Só é acessível se estiver logado - se não estiver ele redireciona para a rota login
+//Se não estiver autenticado - Middleware\Authenticate - se estiver Middleware\RedirectlfAuthenticate
+//Authorization - Providers->AuthServiceProvider
+Route::get('/config', function (\Illuminate\Http\Request $request){
+    $user = $request->user();
+   return view('config', [
+       'user'=>$user,
+       'seeform'=>\Illuminate\Support\Facades\Gate::allows('see-form')]);
+})->name('config')->middleware('auth');
+
+Route::get('/logout', 'Auth\LoginController@logout');

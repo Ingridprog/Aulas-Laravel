@@ -3,6 +3,10 @@
 @section('title', 'Listagem de tarefas')
 
 @section('content')
+
+
+    Olá, {{$user['name']}} - <a href="/logout">Sair</a>
+
     <h1>Listagem</h1>
 
     <a href="{{route('tarefas.add')}}">Criar Nova Tarefa</a><br><br>

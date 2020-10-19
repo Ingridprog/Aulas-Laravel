@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\User;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -48,10 +50,12 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
+//        unique:users - tem que ser único na tabelas users - faz verificação no banco de dados
+//        confirmed - outro campo no formulário para confirmar senha
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'string', 'email', 'max:200', 'unique:users'],
+            'password' => ['required', 'string', 'min:4', 'confirmed'],
         ]);
     }
 
@@ -68,5 +72,28 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+    }
+
+    public function index()
+    {
+        return view('register');
+    }
+
+    public function register(Request $request)
+    {
+        $data = $request->only(['name', 'email', 'password', 'password_confirmation']);
+        $validator = $this->validator($data);
+
+//        withInput - retorna com os campos que o usuário preencheu
+        if($validator->fails()){
+            return redirect()->route('register')
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $user = $this->create($data);
+//        Para logar usuário quando cadastrar
+        Auth::login($user);
+        return redirect()->route('config');
     }
 }

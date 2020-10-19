@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use function foo\func;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -25,6 +26,9 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+//        Authorization - Portão: acessos, privilégios, etc
+        Gate::define('see-form', function ($user){
+            return $user->admin === 1 ? true : false;
+        });
     }
 }

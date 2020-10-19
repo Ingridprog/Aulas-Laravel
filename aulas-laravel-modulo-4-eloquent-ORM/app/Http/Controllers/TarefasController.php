@@ -2,21 +2,41 @@
 
 namespace App\Http\Controllers;
 
+//use Illuminate\Auth\Access\Gate;
 use Illuminate\Http\Request;
 //Acesso ao banco de dados
 use Illuminate\Support\Facades\DB;
 //importar model
 use App\Tarefa;
+//auth
+use Illuminate\Support\Facades\Auth;
+
+use Illuminate\Support\Facades\Gate;
 
 class TarefasController extends Controller
 {
-    public function index()
+
+//    MIDDLEWARE NO CONTROLLER
+    public function __construct()
     {
+        $this->middleware('auth');
+    }
+
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+
+        $frase = __('messeges.test');
+        echo "FRASE: $frase";
+
+//        $user = $request->user();
+
 //        $list = DB::select('SELECT * FROM tarefas');
         $list = Tarefa::all();
 
         return view('tarefas.index', [
-            'list' => $list
+            'list' => $list,
+            'user' => $user
         ]);
     }
 
@@ -86,7 +106,7 @@ class TarefasController extends Controller
         if($tarefa){
             $tarefa->delete();
         }
-        
+
         return redirect()->route('tarefas.index');
     }
 
